@@ -1,4 +1,4 @@
-# pPI6-objectives
+# PI6-objectives
 
 Write for PI-6 objectives Jira tickets.
 
