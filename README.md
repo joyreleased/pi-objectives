@@ -85,7 +85,7 @@ Set up a review with Solution Architects, @Jason Miller and other stakeholders. 
 
 3 Implement proposed certificate automation solution. (PR2 Implementation Task)
 
-Implement the proposed solution provided in step 2. Applu a set of test criteria prefiousy defined.
+Implement the proposed solution provided in step 2. Apply a set of test criteria previousy defined.
 
 Acceptance Criteria:
 Demonstrate certificates can automatically renew expiring certificates wihtout huma intervention in a test bed.
@@ -98,67 +98,14 @@ There are a small number of EKS cluster already exist within CSBS AWS and more a
 
 The work under this Epic begins with an architectural definition that will have input across Audience Crickets adn Forerunners team. The implemention that follows will also be shared across teams in close collaboration so everyn plays apart in the enterprise solution. The implementation will leverage Terraform modules to create the cluster and will be built in iteration following th architectural blueprint.
 
-The architecture needs to touch multiple aspects of the cluster supported by Terraform modules:
-Networking
-  VPC
-  Subnets
-IAM Roles
-Cluster
-  Networking
-    VPC 
-    subnets
-    seconary CIDRS
-  API Server Endpoint
-  Security Groups
-  Metrics
-    Metrics Server
-    Sluster Autoscaling & Tags
-  Compute
-    Managed Node Groups
-      AMI
-      EC2
-      Node Affinity
-    Fargate
-  Load Balancer Controller
-  Monitoring (Datadog)
-  Network Policies
-  Secret Management (Front Runners)
-  Logging (splunk or is that there automatically?)
-  Helm Chart Deployments
-  Helm Chart Ownership
-Applications
-  Certificates
-  DNS
-  Service Accounts for IAM Roles
-  AD & Okta Integrtion
-CI/CD
-  Integrated deployment with GitLab CI/CD (Forerunners)
-Billing
+
 
 Acceptance Criteria:
-An AWS EKS architectural design to follow and a Terraformm Stack that deploys an EKS cluster. Note, some solutions nay not be supported directly by Terraform and require Kubernetes and Helm or Deploy test applications to exercise the various features of the cluster.
+An AWS EKS architectural design to follow and a Terraform stack that deploys an EKS cluster. Note, some solutions nay not be supported directly by Terraform and require Kubernetes and Helm or Deploy test applications to exercise the various features of the cluster.
 
-Compute - Fargate vs managed nodes (likely managed nodes, Fargate is expensive) 
-Modules 
-Metrics server
-Networking 
-Endpoints public or private? 
-Public or private subnets? 
-Certificates 
-Datadog agents 
-Tagging subnets 
-Autoscaling 
-Tagging autoscaling groups 
-Sidecar tools 
-Network policies 
-Secrets management (in conjunction with FR) 
-Helm chart ownership 
-Helm chart deployments (from inside the same repo or from an external repo?) 
-Use Forward Architecture document 
-Savings plan
 
-1 Create an AWS EKS Architecture Document (PI-6 Implementation Task 5 points)
-Create an EKS Architeure document at a shared location for collaboration and comments across AC and Forerunners teams. The architecture should identify design decisions for each of the following:
+1 Create an AWS EKS Architecture Document (PI-6 Implementation Task 8 points)
+Create an EKS Architeure document at a shared location for collaboration and comments across AC and Forerunners teams usig the Forward Architecture format. The architecture should identify design decisions for each of the following:
 
 Networking
   VPC
@@ -196,22 +143,54 @@ CI/CD
   Integrated deployment with GitLab CI/CD (Forerunners)
 Billing
 
-2 Define least prviliged AWS EKS Role for cluster creation
+Acceptance Criteria: 
+Consensus an agreement on the architecture and design by all solution architects, Forerunner team members, @Jason Miller, and all other stake holders.
+
+2 Define least prviliged AWS EKS Role for cluster creation (PI-6 Implementation Task 2 points)
+Currently, the roles usedto create clusters has been the accounts Full Admin roles. This is probably not a great idea forward. Making this assumption, this task defines a role and policies following the least proviliged architectural priciple. The architecture document will discuss if one role should be used for all clusters, on one role/clustetr and if these roles can be used across account keeping them in a a central location.
+
+Acceptance Criteria:
+A least provilideged role for creating clusters that works
 
 3 Create a Base Cluster and Managed Node Group (PI-6 Implementation Task 2 points)
 
-Create a base cluster with public endpoint, default AMIs, three private subnets, three t3.small managed nodes in the sandbox account. Terrform state will be stored in S3
+Using manual Terrafrom commands, create a base cluster with public endpoint, default AMIs, three private subnets, three t3.small managed nodes in the sandbox account into existing VPC and subnets. Terraform state will be stored in S3. Use the IAM defined in task 2.
 
 Acceptance Criteria:
-Attach to the cluster context and
-2 Add Metrics Server and Cluster Autoscaler
-3 Add Load Balancer Controller
-4 Add Network Policy Support
-5 Add Secret Management
-6 Add Monitoring Agents (Datadog)
-7 API Server Endpoint Public/Private Solution
-8 Select and apply an application example to demostrate HPA
-9 Select and apply an application example to demostrate cluster autoscaling
+A base cluster exists. Can attach to the cluster context and execute simple kubectl commands deploy pods and services. Destroy the cluster when finished.
+
+4 Add the custom Amazon Linux 2/3 AMI to the cluster nodegroup.(PI-6 Implementation Task 1 points)
+Currently default nodes are being used in the cluster but going forward an official Amazon Linux 2/3 os image should be used. The creation of the AMI is beding performed by Forerunners in Task XXX. This task is about updating Terrafrm to use that AMI.
+
+Accceptance Criteria:
+Custom AMI nodes are deployed to the cluster and embedded services are shown running. Destroy the cluster when finished.
+
+5 Add Metrics Server to the Cluster (PI-6 Implementation Task 1 point)
+The metrics server collects information on cpuu and memory utilization that Kubernetes uses to scale deplpoyments. A module for the metrics server here:
+https://registry.terraform.io/modules/DNXLabs/eks-metrics-server/aws/latest. If the Terraform metrics server module does not work a straight Kubernetes deployment will be required.
+
+Acceptance Criteria:
+Select and apply an application example to demostrate HPA. Destroy the cluster when finished.
+
+6 Add Cluster Autoscaler (PI-6 Implementation Task 3 points)
+Add the metrics server deployment and an cluster autoscaler to the Terraform. There is a terraform module for the autoscaler here: (https://github.com/terraform-aws-modules/terraform-aws-eks/tree/master/examples/irsa_autoscale_refresh). The recipe deploys the auto scaler using a Helm  chart and adds two features - Instance Refresh (https://aws.amazon.com/blogs/compute/introducing-instance-refresh-for-ec2-auto-scaling) and Node Termination Hanndler (https://github.com/aws/aws-node-termination-handler). The architecture document will provide guidance if these two features are required. The implementation will tag the autoscaling grou accordingly.
+
+Acceptance Criteria:
+Select and apply an application example to demostrate cluster autoscaling. Destroy the cluster when finished.
+
+
+7 Add AWS Load Balancer Controller to the cluster (PI-6 Implementation Task 3 points)
+If an application does not come bundeled with an Ingress controller AWS provides a solution called the AWS Load Balancer Controller. This might be an application deployment time addition. The controller listens for Ingress and provisions an ALB for the service. On order for this to work subnets need t be tagged for subnet discovery. This will be covered in the architecture document. A module for the AWS Load Balancer Controller is located here (https://github.com/Young-ook/terraform-aws-eks/tree/main/examples/lb)
+
+Acceptance Criteria: (PI-6 Implementation Task 3 points)
+Select and apply an application example to demostrate ALB provisioning. Destroy the cluster when finished.
+
+9 Add Network Policy Support (PI-6 Implementation Task 3 points)
+10 Add Secret Management
+11 Add Monitoring Agents (Datadog)
+12 API Server Endpoint Public/Private Solution
+
+
 10 Select and apply an application example to demostrate network policy
 11 Select and apply an application to demonrate secrets management
 12 Select and apply an application to demonstrate monitoring & logging (datadog)
