@@ -4,15 +4,15 @@ Write for PI-6 objectives Jira tickets.
 
 ## PR1: Security Inventory Automation (PI-6 Epic)
 
-As a security analyst, there is a need to understand the libraries, components, and vulnerabilities running in AWS and see the results in a single view. The solution(s) should use cloud-native tooling wherever possible. If the capability can be delivered using AWS services, the they are preferred over any other external solution.
+A security analyst, like any sentry, does rounds for the sake of discovery and inspection to identify system vulnerabilties and mitigate attacks. Vulnerabilities surface in libraries and other components running in AWS and the analyst needs to inspect for these vulnerabilities and review the results reported in a single view.  If this capability can be delivered using AWS services, then they are preferred over any other external solution. The solution(s) should leverage cloud-native tooling wherever possible.
 
 Use Case:
-log4j is vulnerable, which of our assets have it?
+Apache log4j is vulnerable, how do we identify which of our assets use log4j?
 
 Acceptance Criteria:
-single-view inventory of libraries, components and vulnerabilities
+Single-view inventory of libraries, components and other vulnerabilities
 
-Research potentional tooling in AWS for delivering this ask.
+Research potentional tooling in AWS for delivering this task.
 Inspector, SecurityHub, Config, SSM, OpsCenter, ECR
 
 Explore external tooling to understand non AWS offerings:
@@ -22,7 +22,7 @@ Implementation Task(s)
 
 1. Get Overview of AWS services with Amazon (PR1 Implementation Task)
 
-Consult with AWS to get an overview, and potentially a deeper dive of AWS services that provide cataloging capability. Attend the AWS Enterprise Support Office Hours for CSBS that occurs every other week on Tuesdays at 3 to 4 PM ot setup a special session with Jeremy Thomas (thojrm@amazon.com) and Kevin Shaw (awsshaw@amazon.com). Find out what AWS services work together to understand the libraries, components, and vulnerabilities running in AWS and see the results in a single view and how to buid that solution.
+Consult with AWS to get an overview, and potentially a deeper dive of AWS services that provide cataloging capability. Attend the AWS Enterprise Support Office Hours for CSBS that occurs every other week on Tuesdays at 3 to 4 PM to setup a special session with Jeremy Thomas (thojrm@amazon.com) and Kevin Shaw (awsshaw@amazon.com). Find out what AWS services work together to understand the libraries, components, and vulnerabilities running in AWS and see the results in a single view and how to buid that solution.
 
 AWS Services:
 Inspector, SecurityHub, Config, SSM, OpsCenter, ECR
@@ -31,8 +31,8 @@ Acceptance Criteria:
 A strawman design of how these services would provide a single view and what that view would be. 
 
 2. Consult with Outside Vendors (PR1 Implementation Task)
-Even if AWS cloud-native services does meet the need, consult with outside vendors to see how their tools can be used for prevention or mitigation. This implemention task should embelish the 
-strawman design using AWS services by covering a process for mitigation and prevention or if they play no role at all.
+Even if AWS cloud-native services does meet the need, consult with outside vendors to see how their tools can be used for prevention or mitigation. This implemention task should consider the value of embelishing the 
+strawman design using AWS services by augmenting with third-party functionality to compensate for identified deficiencies.
 
 Tools/Vendors:
 Sonatype IQ Server/Nexus Pro - Sonatype
@@ -41,26 +41,28 @@ DataDog - Datadog
 Crowdstrike Falcon - Crowdstrike
 Mulesoft? - Mulesoft
 
-3 Document a proposed Security Inventory Automation design and implementation (PR1 Implementation Task)
+Acceptance Criteria:
+
+3. Document a proposed Security Inventory Automation design and implementation (PR1 Implementation Task)
 Create a proposed design, implemention, and process. This would be an architecture document or PPT presentation.
 
 Acceptance Criteria:
 Set up a review with Solution Architects, @Jason Miller and other stakeholders. All stakeholders sign off on the proposed solution.
 
-4 Implement approved solution (POC) (PR1 Implementation Task)
+4. Implement approved solution (POC) (PR1 Implementation Task)
 
-Implement the design. This may be a POC type activity but if it works it should be quickly switched to production solution. If a new AWS accounts are required, work with Forerunners who are working on Control Tower. It may be potentially necessary to break this task down futher implementation inder this Epic once the details of the solution are better understood.
+Implement the design. This may be a POC type activity, but if it works it should be quickly switched to production solution. If new AWS accounts are required, work with Forerunners who are working on Control Tower. It may be potentially necessary to break this task down in futher detail once the particulars of the solution are determined.
 
 Acceptance Criteria:
-single-view inventory of libraries, components and vulnerabilities.
+Single-view inventory of libraries, components and vulnerabilities implementation.
 
 ------------------------
 
 ## PR2: SSL Certificate Automation (PI-6 Epic)
 
-As a cloud architect and security analyst, there is a need to automate the creation and renewal of certificates in AWS an other internal resources. Currently, certifiates are bought from GoDaddy by someone at CSBS with a credit card and imported into Amazon Certificate Manager (ACM). Additionally, there is a wild card certicate that is used on various load balancers across accounts. When these cerificates need to renew there is alway a scramble to cover them all.
+As a cloud architect and security analyst, there is a need to automate the creation and renewal of certificates in AWS an other internal resources. Currently, certifiates are bought from GoDaddy by someone at CSBS with a credit card and imported into Amazon Certificate Manager (ACM). Additionally, there is a wild card certicate that is used on various load balancers across accounts. When these certificates need to be renewed, there is always a scramble to cover them all.
 
-There is a desire to automate this process and monitor expiration so certificate renewal can be planned inside a well defined maintnance window. For certificates created and managed by Amazon, they are automated rotated and renewed. For certificates used outside of Amazon this not the case and some source other than GoDaddy should be pursued and an automation "tool" would be created to renew certificates (Letsencrypt.org). Location of this auto mation is still to be determined.
+There is a desire to automate this process and monitor expiration so certificate renewal can be planned inside a well defined maintenance window. For certificates created and managed by Amazon, they are automated rotated and renewed. For certificates used outside of Amazon this not the case and some source other than GoDaddy should be pursued and an automation "tool" would be created to renew certificates (Letsencrypt.org). Location of this auto mation is still to be determined.
 
 With EKS workloads, certficates will be created in ACM as part of the deployment using Terraform https://registry.terraform.io/modules/terraform-aws-modules/acm/aws/latest. So they are covered. As deployments are moved away from CDK to Terraform, the same module can be used even if the deployment is not EKS. For certificates provisioned outside of ACM, they should be imported into ACM using Terraform and their status monitored. The current thinking is Datadog can serve that purpose.
 
